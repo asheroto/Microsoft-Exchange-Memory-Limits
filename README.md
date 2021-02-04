@@ -1,6 +1,6 @@
 # Exchange Cache Memory Limits Made Easy
 
-**Microsoft Exchange has a way to limit the amount of cache memory it is using**.  It's not perfect, but it *really helps* when your server *isn't* packed with 128GB of RAM.  😎 
+**Microsoft Exchange has a way to limit the amount of cache memory it is using**.  It's not perfect, but it *really helps* when your server *isn't* packed with 128GB of RAM.  ðŸ˜Ž 
 
 **Real world example:** By adjusting these settings, Exchange Server 2019 can run on a server with 8-16 GB if you have less than 50 users (considering your database size is reasonably small).  I have seen this happen for several clients.  In comparison, Microsoft's minimum recommend RAM requirement is 128 GB.  You must keep in mind, they are mostly serving Exchange Server to businesses with over 500 users, which in that case, 128 GB seems reasonable!
 
@@ -41,7 +41,7 @@ You need to restart the server (or restart all of the *Running* Exchange service
 `.\ExchangeMemoryLimits.ps1 -ListValues`
 
 **Results:**
-![ListValues parameter](https://github.com/asheroto/Microsoft-Exchange-Memory-Limits/screenshots/ListValues.png)
+![ListValues parameter](https://raw.githubusercontent.com/asheroto/Microsoft-Exchange-Memory-Limits/main/screenshots/ListValues.png)
 
 ---
 
@@ -50,7 +50,7 @@ You need to restart the server (or restart all of the *Running* Exchange service
     .\ExchangeMemoryLimits.ps1 -MinSize 1.5GB -MaxSize 3.75GB
 
 **Results:**
-![MinSize and MaxSize parameter](https://github.com/asheroto/Microsoft-Exchange-Memory-Limits/screenshots/MinMax.png)
+![MinSize and MaxSize parameter](https://raw.githubusercontent.com/asheroto/Microsoft-Exchange-Memory-Limits/main/screenshots/MinMax.png)
 
 ---
 **Reset the minimum and maximum memory limit (set as "not set"):**
@@ -58,7 +58,7 @@ You need to restart the server (or restart all of the *Running* Exchange service
     .\ExchangeMemoryLimits.ps1 -Reset
 
 **Results:**
-![Reset parameter](https://github.com/asheroto/Microsoft-Exchange-Memory-Limits/screenshots/Reset.png)
+![Reset parameter](https://raw.githubusercontent.com/asheroto/Microsoft-Exchange-Memory-Limits/main/screenshots/Reset.png)
 
 ---
 
