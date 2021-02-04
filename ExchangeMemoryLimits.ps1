@@ -5,6 +5,7 @@
     Modify Exchange Database Cache Size (Memory Size)
 .NOTES
     Created by   : asheroto
+    Version      : 0.0.1
     Date Coded   : 2/3/2021
     More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
