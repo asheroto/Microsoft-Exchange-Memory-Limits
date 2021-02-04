@@ -55,7 +55,7 @@ If you encounter error while executing the script, please ensure you have the [l
 - Exchange 2000-2003
 - Server 2000-2003
 
-## Pamemoryeters
+## Parameters
 
 **Note**:
 You need to restart the server (or restart all of the *Running* Exchange services if you change the min/max limit.
