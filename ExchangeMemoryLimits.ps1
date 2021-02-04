@@ -6,8 +6,7 @@
 .NOTES
     Created by   : asheroto
     Date Coded   : 2/3/2021
-    More info:   : 
-    Reference    : http://bit.ly/quest-limit-exchange-memory-blog
+    More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
     Set-ExchangeMemoryLimits -MinSize 2GB -MaxSize 4GB
 
