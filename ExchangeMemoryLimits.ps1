@@ -1,17 +1,19 @@
 <#
 .SYNOPSIS
-    Modify Exchange Database Cache Size (Memory Size)
+    Modify Microsoft Exchange Database Cache Size Memory Limit
 .DESCRIPTION
-    Modify Exchange Database Cache Size (Memory Size)
+    Limits the amount of memory the Microsoft Exchange server can use for its cache.
 .NOTES
     Created by   : asheroto
-    Version      : 0.0.1
+    Version      : 0.0.2
     Date Coded   : 2/3/2021
     More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
     Set-ExchangeMemoryLimits -MinSize 2GB -MaxSize 4GB
 
-    Set-ExchangeMemoryLimits -Reset $true
+    Set-ExchangeMemoryLimits -ListValues
+
+    Set-ExchangeMemoryLimits -Reset
 #>
 
 # Parameters
