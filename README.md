@@ -15,6 +15,18 @@ Normally to change the cache settings you have to go into ADSI Edit, go through 
 
 It works just a minute or two.  It also produces a log if desired.
 
+## Requirements
+
+If you encounter error while executing the script, please ensure you have the [latest version of PowerShell](<https://github.com/PowerShell/PowerShell/releases/tag/v7.1.1>).
+
+**Compatible with:**
+- Exchange 2007-2019
+- Server 2008-2019
+
+**Possibly compatible with:**
+- Exchange 2000-2003
+- Server 2000-2003
+
 ## Parameters
 
 **Note**:
