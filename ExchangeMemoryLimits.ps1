@@ -1,11 +1,49 @@
+<#PSScriptInfo
+
+.VERSION 0.1
+
+.GUID cd40f0ac-fdb5-48dd-8880-3b63a0818d40
+
+.AUTHOR asherto
+
+.COMPANYNAME
+
+.COPYRIGHT
+
+.TAGS PowerShell Exchange Memory Limits Limit Size msExchESEParamCacheSizeMin msExchESEParamCacheSizeMax
+
+.LICENSEURI
+
+.PROJECTURI https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+[Version 0.1] - Initial Release
+
+.PRIVATEDATA
+
+#>
+
 <#
 .SYNOPSIS
     Modify Microsoft Exchange Database Cache Size Memory Limit
 .DESCRIPTION
     Limits the amount of memory the Microsoft Exchange server can use for its cache.
+    
+Example Usage:    
+    Set-ExchangeMemoryLimits -MinSize 2GB -MaxSize 4GB
+    Set-ExchangeMemoryLimits -ListValues
+    Set-ExchangeMemoryLimits -Reset
 .NOTES
     Created by   : asheroto
-    Version      : 0.0.2
+    Version      : 0.1
     Date Coded   : 2/3/2021
     More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
@@ -26,7 +64,7 @@ param (
     [parameter(mandatory = $false, ParameterSetName = "Log")][switch]$Log
 )
 
-if($Log.IsPresent) {
+if ($Log.IsPresent) {
     $LogPath = "$($env:USERPROFILE)\Desktop\ADExchLog_$((Get-Date).ToString("yyyy-MM-dd"))_$([GUID]::newGuid().guid).txt"
 }
 
@@ -121,12 +159,12 @@ function get-schemainfo {
 
 }
 function Get-ADValues {
-    param ($identity,$pagesize)
+    param ($identity, $pagesize)
     $mincurrentsize = (Get-ADObject -Identity $identity -Properties msExchESEParamCacheSizeMin).msExchESEParamCacheSizeMin
     $maxcurrentsize = (Get-ADObject -Identity $identity -Properties msExchESEParamCacheSizeMax).msExchESEParamCacheSizeMax
 
-    $minsizeGB = $(($mincurrentsize)*$pagesize/1GB)
-    $maxsizeGB = $(($maxcurrentsize)*$pagesize/1GB)
+    $minsizeGB = $(($mincurrentsize) * $pagesize / 1GB)
+    $maxsizeGB = $(($maxcurrentsize) * $pagesize / 1GB)
 
     $memsizevalues = [pscustomobject]@{"msExchESEParamCacheSizeMin" = $mincurrentsize; "Minimum size in GB" = $minsizeGB; "msExchESEParamCacheSizeMax" = $maxcurrentsize; "Maximum size in GB" = $maxsizeGB }
 
@@ -171,13 +209,11 @@ foreach ($servername in $servernames) {
 
     if ($ListValues.IsPresent) {
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
-    }
-    elseif ($Reset.IsPresent) { 
+    } elseif ($Reset.IsPresent) { 
         Set-ADObject -Identity $level9path -Clear "msExchESEParamCacheSizeMin", "msExchESEParamCacheSizeMax"
         Write-Host "`nMinimum and maximum have been reset to defaults, which is 'not set'" -ForegroundColor Green
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
-    }
-    else {
+    } else {
         [int]$minnewsize = parse-Size -Size $MinSize -pagesize $adinfo.SelectedDatabasePageSize
         [int]$maxnewsize = parse-size -Size $MaxSize -pagesize $adinfo.SelectedDatabasePageSize
         
