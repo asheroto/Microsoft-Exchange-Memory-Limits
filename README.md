@@ -1,12 +1,14 @@
 # Exchange Cache Memory Limits Made Easy
 
-**Microsoft Exchange has a way to limit the amount of cache memory it is using**.  It's not perfect, but it *really helps* when your server *isn't* packed with 128GB of RAM.  ðŸ˜Ž 
+**Microsoft Exchange has a way to limit the amount of cache memory it is using**.  It's not perfect, but it *really helps* when your server *isn't* packed with 128GB of RAM.
 
 **Real world example:** By adjusting these settings, Exchange Server 2019 can run on a server with 8-16 GB if you have less than 50 users (considering your database size is reasonably small).  I have seen this happen for several clients.  In comparison, Microsoft's minimum recommend RAM requirement is 128 GB.  You must keep in mind, they are mostly serving Exchange Server to businesses with over 500 users, which in that case, 128 GB seems reasonable!
 
 By default, Exchange will just consume your entire computer's RAM for cache purposes.  Depending on how many users you have, and what your server is used for, or how much RAM you have, this can become a real pain.
 
 Normally to change the cache settings you have to go into ADSI Edit, go through a long rabbit hole of clicking, then changing parameters, doing some math depending on the page file size, BLAH.
+
+---
 
 **This script enables you to:**
 - **Get** the current cache memory limits
@@ -17,18 +19,29 @@ It works just a minute or two.  It also produces a log if desired.
 
 ---
 
-## Warning:
-Don't set the min/max limit to a small number, especially if you have a lot of users or a large database.
+## Warnings:
+
+- Don't set the min/max limit to a small number, especially if you have a lot of users or a large database.
+- If you have trouble with Exchange after setting a min/max limit, try a higher limit and restart. If that still doesn't work, just reset the configuration using the `-Reset` parameter
+- Always have a backup of your Exchange server before you make any changes to Active Directory Schemas
 
 ---
 
-### What do I set the min/max limit to?
+## Restart is required
+
+You need to restart the server (or restart all of the *Running* Exchange services if you change the min/max limit or reset it to defaults ("not set").
+
+---
+
+## What do I set the min/max limit to?
 
 [Use the table on this article for some ideas](<https://ntlong.wordpress.com/2011/09/16/limiting-exchange-2010-database-cache/>). That article is from 2011, so add a few GB to your calculations.
 
 It is best to work down from your current memory, rather than up. Try setting your minimum to 40% of your memory, and your maximum to 70% of your memory. Wait a few days, if you don't have any complaints, work slowly down from there.
 
 Your min/max setting just depends on how much memory you have compared so how much memory Exchange *actually* needs. Check Performance Monitor to analyze the Exchange services on your server.
+
+---
 
 ## Requirements
 
@@ -59,10 +72,6 @@ You need to restart the server (or restart all of the *Running* Exchange service
 
 ## Example Usage
 
-**Note**:
-You need to restart the server (or restart all of the *Running* Exchange services if you change the min/max limit.
-
----
 **Get the current values of the Exchange cache size memory limit:**
 
 `.\ExchangeMemoryLimits.ps1 -ListValues`
