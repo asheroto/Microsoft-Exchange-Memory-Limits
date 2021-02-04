@@ -55,6 +55,16 @@ If you encounter error while executing the script, please ensure you have the [l
 - Exchange 2000-2003
 - Server 2000-2003
 
+## Installation
+
+You can either [download the latest ps1 from Releases](https://github.com/asheroto/Microsoft-Exchange-Memory-Limits/releases/latest/download/ExchangeMemoryLimits.ps1), or type the following command in PowerShell:
+
+`Install-Script ExchangeMemoryLimits`
+
+It should install from [PowerShell Gallery](https://www.powershellgallery.com/packages/ExchangeMemoryLimits) automatically. You may need to answer **Yes** to a few prompts first.
+
+After installed, you can just open PowerShell and reference `ExchangeMemoryLimits.ps1` from any directory.
+
 ## Parameters
 
 **Note**:
