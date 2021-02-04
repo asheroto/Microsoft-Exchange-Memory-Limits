@@ -15,6 +15,21 @@ Normally to change the cache settings you have to go into ADSI Edit, go through 
 
 It works just a minute or two.  It also produces a log if desired.
 
+---
+
+## Warning:
+Don't set the min/max limit to a small number, especially if you have a lot of users or a large database.
+
+---
+
+### What do I set the min/max limit to?
+
+[Use the table on this article for some ideas](<https://ntlong.wordpress.com/2011/09/16/limiting-exchange-2010-database-cache/>). That article is from 2011, so add a few GB to your calculations.
+
+It is best to work down from your current memory, rather than up. Try setting your minimum to 40% of your memory, and your maximum to 70% of your memory. Wait a few days, if you don't have any complaints, work slowly down from there.
+
+Your min/max setting just depends on how much memory you have compared so how much memory Exchange *actually* needs. Check Performance Monitor to analyze the Exchange services on your server.
+
 ## Requirements
 
 If you encounter error while executing the script, please ensure you have the [latest version of PowerShell](<https://github.com/PowerShell/PowerShell/releases/tag/v7.1.1>).
