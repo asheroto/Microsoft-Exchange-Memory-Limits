@@ -2,7 +2,7 @@
 
 **Microsoft Exchange has a way to limit the amount of cache memory it is using**.  It's not perfect, but it *really helps* when your server *isn't* packed with 128 GB of memory.
 
-**Real world example:** By adjusting these settings, Exchange Server 2019 can run on a server with 8-16 GB if you have less than 50 users (considering your database size is reasonably small).  I have seen this happen for several clients.  In comparison, Microsoft's minimum recommend memory requirement is 128 GB.  You must keep in mind, they are mostly selling Exchange Server to businesses with over 500 users, which in that case, 128 GB seems reasonable!
+**Real world example:** By adjusting these settings, Exchange Server 2019 can run on a server with 16 GB if you have less than 50 users (considering your database size is reasonably small).  I have seen this happen for several clients.  In comparison, Microsoft's minimum recommend memory requirement is 128 GB.  You must keep in mind, they are mostly selling Exchange Server to businesses with over 500 users, which in that case, 128 GB seems reasonable!
 
 By default, Exchange will just consume your entire computer's memory for cache purposes.  Depending on how many users you have, and what your server is used for, or how much memory you have, this can become a real pain.
 
