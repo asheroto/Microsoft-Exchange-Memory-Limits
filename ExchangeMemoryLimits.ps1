@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 0.1
+.VERSION 1.0
 
 .GUID cd40f0ac-fdb5-48dd-8880-3b63a0818d40
 
@@ -18,7 +18,7 @@
 
 .ICONURI
 
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 
 .REQUIREDSCRIPTS
 
@@ -26,6 +26,7 @@
 
 .RELEASENOTES
 [Version 0.1] - Initial Release
+[Version 1.0] - Fixed underline variable name, parse-size missing dollar sign, page sizes stored as strings, fragile AD traversal for dynamic names, unnecessary scriptblock arithmetic, Log parameter set isolation, renamed functions to approved verb-noun convention. Added Exchange 2019 CU10.
 
 .PRIVATEDATA
 
@@ -36,14 +37,14 @@
     Modify Microsoft Exchange Database Cache Size Memory Limit
 .DESCRIPTION
     Limits the amount of memory the Microsoft Exchange server can use for its cache.
-    
-Example Usage:    
+
+Example Usage:
     Set-ExchangeMemoryLimits -MinSize 2GB -MaxSize 4GB
     Set-ExchangeMemoryLimits -ListValues
     Set-ExchangeMemoryLimits -Reset
 .NOTES
     Created by   : asheroto
-    Version      : 0.1
+    Version      : 0.3
     Date Coded   : 2/3/2021
     More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
@@ -61,7 +62,7 @@ param (
     [parameter(mandatory = $true, ParameterSetName = "Setexec", HelpMessage = "Enter the size in KB, MB or GB")][String]$MaxSize,
     [parameter(mandatory = $false, ParameterSetName = "Resetexec")][switch]$Reset,
     [parameter(mandatory = $false, ParameterSetName = "List")][switch]$ListValues,
-    [parameter(mandatory = $false, ParameterSetName = "Log")][switch]$Log
+    [parameter(mandatory = $false)][switch]$Log
 )
 
 if ($Log.IsPresent) {
@@ -69,12 +70,12 @@ if ($Log.IsPresent) {
 }
 
 # Functions
-function underline-headline {
+function Format-Headline {
     param($headline, $ul = "-")
-    $uline = $ul * ($headerline.Length)
+    $uline = $ul * ($headline.Length)
     return "$headline`n$uline"
 }
-function get-parameters {
+function Get-ScriptParameters {
     param($scriptinfo)
     $ParameterList = (Get-Command -Name $scriptinfo).Parameters
     $myparameters = @()
@@ -84,7 +85,7 @@ function get-parameters {
     }
     return "`nParameters you specified: `n$($myparameters | Format-Table -AutoSize | out-string)"
 }
-function handle-ADmodule {
+function Initialize-ADModule {
     if (get-module -listavailable -Name ActiveDirectory) {
         if (!(get-module -Name ActiveDirectory)) {
             import-module ActiveDirectory
@@ -93,11 +94,11 @@ function handle-ADmodule {
     }
     return $false
 }
-function navigate-ad {
+function Get-ADChildItems {
     param($name, $level)
     return get-childitem -path "AD:\$(($level | Where-Object {$_.name -eq $name}).DistinguishedName)" -Force
 }
-function get-schemainfo {
+function Get-SchemaInfo {
     param($levelzero)
     $SchemaVersionTable = @{
         "13"    = "Windows 2000 Schema" ;
@@ -142,19 +143,20 @@ function get-schemainfo {
         "17000" = "Exchange 2019 RTM/CU1 Schema";
         "17001" = "Exchange 2019 CU2-CU7 Schema";
         "17002" = "Exchange 2019 CU8 Schema";
+        "17003" = "Exchange 2019 CU10 and later Schema";
     }
 
     $level2schema = ($levelzero | Where-Object { $_.name -eq "Schema" }).distinguishedname.toString()
     $schemaVersionId = (get-ADobject -Identity $level2schema -Properties "objectVersion").objectversion
     $adschema = $SchemaVersionTable[$schemaVersionId.tostring()]
-    
+
     $level2vpath = (get-childitem -Path "AD:\$level2schema" | Where-Object { $_.name -eq "ms-Exch-Schema-Version-Pt" }).tostring()
     $exchangeversionID = (get-ADobject -Identity $level2vpath -Properties rangeUpper).rangeUpper
     $exchSchema = $SchemaVersionTable[$exchangeversionID.tostring()]
-    
-    $pagesize = "32KB"
 
-    if ($exchSchema -like "*2007*") { $pagesize = "8KB" }
+    $pagesize = 32KB
+
+    if ($exchSchema -like "*2007*") { $pagesize = 8KB }
     return [pscustomobject]@{DetectedActiveDirectorySchema = $adschema; DetectedExchangeSchema = $exchSchema; SelectedDatabasePageSize = $pagesize }
 
 }
@@ -170,12 +172,11 @@ function Get-ADValues {
 
     return $memsizevalues
 }
-function parse-size {
+function ConvertTo-ADPageCount {
     param ($size, $pagesize = 32KB)
-    $sbsize = [scriptblock]::Create($size / $pagesize)
-    $mynumber = invoke-command -ScriptBlock $sbsize
-    iF ($mynumber % [int]$mynumber -gt 0) {
-        Smynumber = $mynumber - 0.5
+    $mynumber = [long]$size / $pagesize
+    if ($mynumber % [int]$mynumber -gt 0) {
+        $mynumber = $mynumber - 0.5
     }
     return [System.Math]::Round($mynumber, 0)
 }
@@ -185,38 +186,38 @@ if ($Log.isPresent) {
 }
 
 Clear-Host
-Write-Host "$(underline-headline -headline 'Exchange Cache Memory Operations via Active Directory')`n" -ForegroundColor Green
-Get-Parameters -scriptinfo $MyInvocation.InvocationName
+Write-Host "$(Format-Headline -headline 'Exchange Cache Memory Operations via Active Directory')`n" -ForegroundColor Green
+Get-ScriptParameters -scriptinfo $MyInvocation.InvocationName
 
-if (!(handle-ADmodule)) { Write-Host "`n`nActiveDirectory module is not available. Exiting...`n" -ForegroundColor Yellow; exit }
+if (!(Initialize-ADModule)) { Write-Host "`n`nActiveDirectory module is not available. Exiting...`n" -ForegroundColor Yellow; exit }
 
 $level0 = get-childitem -Path AD:\
-$level1 = navigate-ad -level $level0 -name "Configuration"
-$level2 = navigate-ad -level $level1 -name "Services"
-$level3 = navigate-ad -level $level2 -name "Microsoft Exchange"
-$level4 = navigate-ad -level $level3 -name $level3.name.ToString()
-$level5 = navigate-ad -level $level4 -name "Administrative Groups"
-$level6 = navigate-ad -level $level5 -name $level5.name.ToString()
-$level7 = navigate-ad -level $level6 -name "Servers"
+$level1 = Get-ADChildItems -level $level0 -name "Configuration"
+$level2 = Get-ADChildItems -level $level1 -name "Services"
+$level3 = Get-ADChildItems -level $level2 -name "Microsoft Exchange"
+$level4 = Get-ADChildItems -level $level3 -name ($level3 | Select-Object -First 1).Name
+$level5 = Get-ADChildItems -level $level4 -name "Administrative Groups"
+$level6 = Get-ADChildItems -level $level5 -name ($level5 | Select-Object -First 1).Name
+$level7 = Get-ADChildItems -level $level6 -name "Servers"
 Write-Host "Please select one or more listed servers" -ForegroundColor Yellow
 [array]$servernames = $level7.name | Out-GridView -Title "Select the Exchange Server(s) to process" -PassThru
 
-$adinfo = get-schemainfo -levelzero $level0
+$adinfo = Get-SchemaInfo -levelzero $level0
 $adinfo | Format-Table -AutoSize
 foreach ($servername in $servernames) {
-    $level8 = navigate-ad -level $level7 -name $servername
+    $level8 = Get-ADChildItems -level $level7 -name $servername
     $level9path = ($level8 | Where-Object { $_.name -eq "InformationStore" }).distinguishedname.tostring()
 
     if ($ListValues.IsPresent) {
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
-    } elseif ($Reset.IsPresent) { 
+    } elseif ($Reset.IsPresent) {
         Set-ADObject -Identity $level9path -Clear "msExchESEParamCacheSizeMin", "msExchESEParamCacheSizeMax"
         Write-Host "`nMinimum and maximum have been reset to defaults, which is 'not set'" -ForegroundColor Green
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
     } else {
-        [int]$minnewsize = parse-Size -Size $MinSize -pagesize $adinfo.SelectedDatabasePageSize
-        [int]$maxnewsize = parse-size -Size $MaxSize -pagesize $adinfo.SelectedDatabasePageSize
-        
+        [int]$minnewsize = ConvertTo-ADPageCount -Size $MinSize -pagesize $adinfo.SelectedDatabasePageSize
+        [int]$maxnewsize = ConvertTo-ADPageCount -Size $MaxSize -pagesize $adinfo.SelectedDatabasePageSize
+
         Set-ADObject -Identity $level9path -Replace @{msExchESEParamCacheSizeMin = $minnewsize; msExchESEParamCacheSizeMax = $maxnewsize }
         Write-Host "`nNew AD Attributes Values" -ForegroundColor Green
         Get-ADValues -Identity $level9path -pagesize $adinfo.selectedDatabasePageSize
