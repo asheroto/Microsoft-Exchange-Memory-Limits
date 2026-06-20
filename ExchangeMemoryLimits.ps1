@@ -112,7 +112,8 @@ function Get-SchemaInfo {
         "69"    = "Windows Server 2012 R2 Schema" ;
         "81"    = "Windows Server 2016 Technical Preview Schema" ;
         "87"    = "Windows Server 2016 Schema" ;
-        "88"    = "Windows Server 2019 Schema" ;
+        "88"    = "Windows Server 2019/2022 Schema" ;
+        "91"    = "Windows Server 2025 Schema" ;
         "4397"  = "Exchange 2000 RTM Schema" ;
         "4406"  = "Exchange 2000 SP3 Schema" ;
         "6870"  = "Exchange 2003 RTM Schema" ;
