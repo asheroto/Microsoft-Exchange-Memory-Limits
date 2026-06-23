@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 
 .GUID cd40f0ac-fdb5-48dd-8880-3b63a0818d40
 
@@ -27,6 +27,7 @@
 .RELEASENOTES
 [Version 0.1] - Initial Release
 [Version 1.0] - Fixed underline variable name, parse-size missing dollar sign, page sizes stored as strings, fragile AD traversal for dynamic names, unnecessary scriptblock arithmetic, Log parameter set isolation, renamed functions to approved verb-noun convention. Added Exchange 2019 CU10.
+[Version 1.1] - Schema update
 
 .PRIVATEDATA
 
