@@ -48,8 +48,8 @@ Your min/max setting just depends on how much memory you have compared so how mu
 If you encounter error while executing the script, please ensure you have the [latest version of PowerShell](<https://github.com/PowerShell/PowerShell/releases/tag/v7.1.1>).
 
 **Compatible with:**
-- Exchange 2007-2019
-- Server 2008-2019
+- Exchange 2007-2019 and Exchange Server SE
+- Server 2008-2025
 
 **Possibly compatible with:**
 - Exchange 2000-2003
@@ -122,6 +122,14 @@ The script adjusts two parameters for Exchange inside of Active Directory:
 These parameters are located in **Schema**:
 
     CN=Configuration,DC=YourDomain,DC=YourTLDLikeComOrNet,CN=Services,CN=Microsoft EXchange,CN=privcloud,CN=Administrative Groups,CN=Exchange Administrative Group,CN=Servers,CN=YourServerName,CN=InformationStore
+
+# Windows Server Core
+
+This script will run on Windows Server Core, but you will need to install the Exchange App compatibility feature first.  You can do this by running the following command in PowerShell:
+
+```
+Add-WindowsCapability -Online -Name "ServerCore.AppCompatibility~~~~0.0.1.0"
+```
 
 # Credit
 
