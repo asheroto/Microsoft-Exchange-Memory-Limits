@@ -45,7 +45,7 @@ Example Usage:
     Set-ExchangeMemoryLimits -Reset
 .NOTES
     Created by   : asheroto
-    Version      : 1.0
+    Version      : 1.1
     More info:   : https://github.com/asheroto/Microsoft-Exchange-Memory-Limits
 .EXAMPLE
     Set-ExchangeMemoryLimits -MinSize 2GB -MaxSize 4GB
