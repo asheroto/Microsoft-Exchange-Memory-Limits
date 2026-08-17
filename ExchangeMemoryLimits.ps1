@@ -75,7 +75,8 @@ function Format-Headline {
     $uline = $ul * ($headline.Length)
     return "$headline`n$uline"
 }
-function Get-ScriptParameters {
+function Get-ScriptParameter {
+    [Alias('Get-ScriptParameters')]
     param($scriptinfo)
     $ParameterList = (Get-Command -Name $scriptinfo).Parameters
     $myparameters = @()
@@ -83,20 +84,21 @@ function Get-ScriptParameters {
         $myparam = Get-Variable -Name $key -ErrorAction SilentlyContinue;
         if ($myparam.value) { $myparameters += [pscustomobject]@{Parameter = "-$($myparam.name)"; Value = "$($myparam.value)" } }
     }
-    return "`nParameters you specified: `n$($myparameters | Format-Table -AutoSize | out-string)"
+    return "`nParameters you specified: `n$($myparameters | Format-Table -AutoSize | Out-String)"
 }
 function Initialize-ADModule {
-    if (get-module -listavailable -Name ActiveDirectory) {
-        if (!(get-module -Name ActiveDirectory)) {
-            import-module ActiveDirectory
+    if (Get-Module -ListAvailable -Name ActiveDirectory) {
+        if (!(Get-Module -Name ActiveDirectory)) {
+            Import-Module ActiveDirectory
         }
         return $true
     }
     return $false
 }
-function Get-ADChildItems {
+function Get-ADChildItem {
+    [Alias('Get-ADChildItems')]
     param($name, $level)
-    return get-childitem -path "AD:\$(($level | Where-Object {$_.name -eq $name}).DistinguishedName)" -Force
+    return Get-ChildItem -Path "AD:\$(($level | Where-Object {$_.name -eq $name}).DistinguishedName)" -Force
 }
 function Get-SchemaInfo {
     param($levelzero)
@@ -151,8 +153,8 @@ function Get-SchemaInfo {
     $schemaVersionId = (get-ADobject -Identity $level2schema -Properties "objectVersion").objectversion
     $adschema = $SchemaVersionTable[$schemaVersionId.tostring()]
 
-    $level2vpath = (get-childitem -Path "AD:\$level2schema" | Where-Object { $_.name -eq "ms-Exch-Schema-Version-Pt" }).tostring()
-    $exchangeversionID = (get-ADobject -Identity $level2vpath -Properties rangeUpper).rangeUpper
+    $level2vpath = (Get-ChildItem -Path "AD:\$level2schema" | Where-Object { $_.name -eq "ms-Exch-Schema-Version-Pt" }).tostring()
+    $exchangeversionID = (Get-ADobject -Identity $level2vpath -Properties rangeUpper).rangeUpper
     $exchSchema = $SchemaVersionTable[$exchangeversionID.tostring()]
 
     $pagesize = 32KB
@@ -161,7 +163,8 @@ function Get-SchemaInfo {
     return [pscustomobject]@{DetectedActiveDirectorySchema = $adschema; DetectedExchangeSchema = $exchSchema; SelectedDatabasePageSize = $pagesize }
 
 }
-function Get-ADValues {
+function Get-ADValue {
+    [Alias('Get-ADValues')]
     param ($identity, $pagesize)
     $mincurrentsize = (Get-ADObject -Identity $identity -Properties msExchESEParamCacheSizeMin).msExchESEParamCacheSizeMin
     $maxcurrentsize = (Get-ADObject -Identity $identity -Properties msExchESEParamCacheSizeMax).msExchESEParamCacheSizeMax
@@ -192,7 +195,7 @@ Get-ScriptParameters -scriptinfo $MyInvocation.InvocationName
 
 if (!(Initialize-ADModule)) { Write-Host "`n`nActiveDirectory module is not available. Exiting...`n" -ForegroundColor Yellow; exit }
 
-$level0 = get-childitem -Path AD:\
+$level0 = Get-ChildItem -Path AD:\
 $level1 = Get-ADChildItems -level $level0 -name "Configuration"
 $level2 = Get-ADChildItems -level $level1 -name "Services"
 $level3 = Get-ADChildItems -level $level2 -name "Microsoft Exchange"
@@ -211,11 +214,13 @@ foreach ($servername in $servernames) {
 
     if ($ListValues.IsPresent) {
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
-    } elseif ($Reset.IsPresent) {
+    } 
+    elseif ($Reset.IsPresent) {
         Set-ADObject -Identity $level9path -Clear "msExchESEParamCacheSizeMin", "msExchESEParamCacheSizeMax"
         Write-Host "`nMinimum and maximum have been reset to defaults, which is 'not set'" -ForegroundColor Green
         Get-ADValues -identity $level9path -pagesize $adinfo.selectedDatabasePageSize
-    } else {
+    } 
+    else {
         [int]$minnewsize = ConvertTo-ADPageCount -Size $MinSize -pagesize $adinfo.SelectedDatabasePageSize
         [int]$maxnewsize = ConvertTo-ADPageCount -Size $MaxSize -pagesize $adinfo.SelectedDatabasePageSize
 
